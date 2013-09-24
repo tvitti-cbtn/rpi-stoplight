@@ -50,9 +50,23 @@ int main(int argc, char **argv)
   setup_io();
   // set the GPIO pins used for serial comm with shift registers to output
   setup_shiftreg();
-  output_int(0b1010101010101010);
-  usleep(500000);
-  output_int(0b0101010101010101);
+  output_int(0b1111111111111111);
+  sleep(1);
+  output_int(0b0);
+  sleep(1);
+  output_int(0b1001001001001000);
+  sleep(1);
+  output_int(0b0);
+  sleep(1);
+  output_int(0b0100100100100100);
+  sleep(1);
+  output_int(0b0);
+  sleep(1);
+  output_int(0b0010010010010010);
+  sleep(1);
+  output_int(0b0);
+
+
 
   return 0;
 
@@ -79,10 +93,12 @@ void output_int(int c_out)
   GPIO_CLR = 1<<SER;
   GPIO_CLR = 1<<SCLK;
   GPIO_CLR = 1<<RCLK;
+  usleep(50000);
   for(i = 0;i < 16; i++) {
     printf("c_out lsb is: %d, bit is %d\n", c_out&1, i);
     // pull serial clock low
     GPIO_CLR = 1<<SCLK;
+    usleep(50000);
     printf("SCLK low\n");
     // set SER to the current bit value
     if( c_out&1 ) {
@@ -92,14 +108,17 @@ void output_int(int c_out)
       GPIO_CLR = 1<<SER;
       printf("SER 0\n");
     }
+    usleep(50000);
     // drive SCLK high once serial is set
     GPIO_SET = 1<<SCLK;
     printf("SCLK high\n");
     // push the lsb off c_out
     c_out = c_out >> 1;
+    usleep(50000);
   }
   // drive RCLK high to latch new values
   GPIO_SET = 1<<RCLK;
+  usleep(50000);
   printf("RCLK high\n");
   // pull everything low
   GPIO_CLR = 1<<SER;
